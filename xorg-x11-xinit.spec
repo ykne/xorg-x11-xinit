@@ -3,7 +3,7 @@
 Summary:    X.Org X11 X Window System xinit startup scripts
 Name:       xorg-x11-%{pkgname}
 Version:    1.4.0
-Release:    13%{?dist}
+Release:    14%{?dist}
 License:    MIT
 URL:        https://www.x.org
 
@@ -47,7 +47,7 @@ BuildRequires:  dbus-devel
 Requires:   xorg-x11-xauth
 # next two are for localuser.sh
 Requires:   coreutils
-Requires:   xhost
+Requires:   xhost xrdb setxkbmap xmodmap
 
 Provides:   %{pkgname} = %{version}
 
@@ -119,6 +119,11 @@ install -p -m644 -D %{SOURCE18} $RPM_BUILD_ROOT%{_datadir}/xsessions/xinit-compa
 %{_datadir}/xsessions/xinit-compat.desktop
 
 %changelog
+* Fri Mar 25 2022 Peter Hutterer <peter.hutterer@redhat.com> - 1.4.0-14
+- Require xmodmap, setxkbmap and xrdb after the xorg-x11-server-utils
+  deaggregation (#1961036). These are all (conditionally) invoked from
+  xinitrc-common.
+
 * Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
@@ -247,8 +252,8 @@ install -p -m644 -D %{SOURCE18} $RPM_BUILD_ROOT%{_datadir}/xsessions/xinit-compa
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
 * Mon Oct 01 2012 Kevin Fenzi <kevin@scrye.com> 1.3.2-7
-- Add patch to not switch tty's, so systemd-logind works right with startx. 
-- Partially Fixes bug #806491 
+- Add patch to not switch tty's, so systemd-logind works right with startx.
+- Partially Fixes bug #806491
 
 * Sun Jul 22 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.2-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
