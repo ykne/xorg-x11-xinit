@@ -3,7 +3,7 @@
 Summary:    X.Org X11 X Window System xinit startup scripts
 Name:       xorg-x11-%{pkgname}
 Version:    1.4.0
-Release:    14%{?dist}
+Release:    15%{?dist}
 License:    MIT
 URL:        https://www.x.org
 
@@ -119,6 +119,9 @@ install -p -m644 -D %{SOURCE18} $RPM_BUILD_ROOT%{_datadir}/xsessions/xinit-compa
 %{_datadir}/xsessions/xinit-compat.desktop
 
 %changelog
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
 * Fri Mar 25 2022 Peter Hutterer <peter.hutterer@redhat.com> - 1.4.0-14
 - Require xmodmap, setxkbmap and xrdb after the xorg-x11-server-utils
   deaggregation (#1961036). These are all (conditionally) invoked from
