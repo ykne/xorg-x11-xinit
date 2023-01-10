@@ -38,6 +38,9 @@ fi
 if [ -n "$GSESSION" ]; then
     # by default, we run GNOME.
     exec "$GSESSION"
+elif [ -n "$MSESSION" ]; then
+    # if GNOME isn't installed, try MATE
+    exec "$MSESSION"
 elif [ -n "$STARTKDE" ]; then
     # if GNOME isn't installed, try KDE.
     exec "$STARTKDE"
