@@ -63,9 +63,9 @@ managers.
 
 %prep
 %setup -q -n %{pkgname}-%{version}
-%patch1 -p1
-%patch5 -p1
-%patch6 -p1
+%patch -P1 -p1
+%patch -P5 -p1
+%patch -P6 -p1
 
 %build
 %configure
