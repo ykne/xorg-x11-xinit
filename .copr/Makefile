@@ -23,7 +23,8 @@ LOCAL_REPO ?= $(HOME)/gnome-x11-build/copr/RPMS-f45
 .PHONY: srpm
 srpm:
 	set -e; \
-	command -v spectool >/dev/null 2>&1 || dnf install -y rpmdevtools; \
+	{ command -v git >/dev/null 2>&1 && command -v spectool >/dev/null 2>&1; } \
+		|| dnf install -y git-core rpmdevtools; \
 	workdir=$$(mktemp -d); \
 	mkdir -p "$$workdir/SOURCES"; \
 	cp *.patch Xsession xinitrc xinitrc-common Xclients Xmodmap Xresources \
