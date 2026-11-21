@@ -5,17 +5,16 @@
 # This repo is Fedora's dist-git layout for xorg-x11-xinit (spec, plain
 # flat-file sources, patches) plus our own fix commit(s) on top, not a
 # source tree. Fedora's own spec still uses a literal Release (no
-# rpmautospec), so instead of hardcoding a Release bump that would need
-# manual editing on every future commit, this Makefile computes it at
-# srpm time: BASE_COMMIT_COUNT is the commit count of the unmodified
-# dist-git f45 import (`git rev-list --count HEAD` at 2bad89a, before
-# our first fix commit); the suffix is how many commits we've added
-# since, so it goes up automatically as this branch gets more commits.
+# rpmautospec); rather than track Fedora's own current Release number to
+# stay ahead of it (fragile - a future Fedora bump could outrank us),
+# this follows the same convention as the other forked packages here
+# (gdm, mutter, gnome-shell, ...): Release = <HEAD commit timestamp>.g
+# <short hash>%{?dist}. The timestamp numerically outranks any realistic
+# small-integer Fedora Release on its own, with no base number to track,
+# and it changes automatically with every new commit.
 
 PKG := xorg-x11-xinit
 VERSION := 1.4.3
-BASE_RELEASE := 6
-BASE_COMMIT_COUNT := 166
 
 MOCK_CHROOT ?= fedora-45-x86_64
 LOCAL_REPO ?= $(HOME)/gnome-x11-build/copr/RPMS-f45
@@ -29,10 +28,9 @@ srpm:
 	mkdir -p "$$workdir/SOURCES"; \
 	cp *.patch Xsession xinitrc xinitrc-common Xclients Xmodmap Xresources \
 		localuser.sh xinit-compat xinit-compat.desktop "$$workdir/SOURCES/"; \
-	total_commits=$$(git rev-list --count HEAD); \
-	rel_suffix=$$(( total_commits - $(BASE_COMMIT_COUNT) )); \
-	[ "$$rel_suffix" -ge 1 ] || rel_suffix=1; \
-	sed -e "s/^Release:.*/Release:    $(BASE_RELEASE).$${rel_suffix}%{?dist}/" \
+	hash=$$(git rev-parse --short=8 HEAD); \
+	ts=$$(git log -1 --format=%ct HEAD); \
+	sed -e "s/^Release:.*/Release:    $${ts}.g$${hash}%{?dist}/" \
 		"$(spec)" > "$$workdir/$(PKG).spec"; \
 	spectool -g -C "$$workdir/SOURCES" "$$workdir/$(PKG).spec"; \
 	( cd "$$workdir/SOURCES" && sha512sum -c "$(CURDIR)/sources" ); \
