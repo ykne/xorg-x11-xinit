@@ -51,11 +51,25 @@ for file in /etc/X11/xinit/xinitrc.d/* ; do
         . $file
 done
 
+# A stale SSH_AUTH_SOCK/SSH_AGENT_PID can survive in the systemd --user
+# manager across a logout/login (e.g. a concurrent ssh session keeps it
+# alive) even after the agent behind it is long gone; clear it so the
+# checks below do not skip past a dead agent.
+if [ -n "$SSH_AUTH_SOCK" ] && [ ! -S "$SSH_AUTH_SOCK" ]; then
+    unset SSH_AUTH_SOCK SSH_AGENT_PID
+fi
+
 # If a systemd-managed ssh-agent socket (gcr-ssh-agent) is already listening,
-# use it instead of wrapping the session in a second ssh-agent.
-if [ -z "$SSH_AUTH_SOCK" ] && [ -n "$XDG_RUNTIME_DIR" ] && [ -S "$XDG_RUNTIME_DIR/gcr/ssh" ]; then
-    SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gcr/ssh"
-    export SSH_AUTH_SOCK
+# use it instead of wrapping the session in a second ssh-agent. The socket
+# is normally only started by gnome-session-services.target, i.e. by
+# gnome-session itself, which runs after this script - so ask systemd to
+# start it here too, before deciding whether to fall back to ssh-agent.
+if [ -z "$SSH_AUTH_SOCK" ] && [ -n "$XDG_RUNTIME_DIR" ]; then
+    systemctl --user start gcr-ssh-agent.socket 2>/dev/null
+    if [ -S "$XDG_RUNTIME_DIR/gcr/ssh" ]; then
+        SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gcr/ssh"
+        export SSH_AUTH_SOCK
+    fi
 fi
 
 # Prefix launch of session with ssh-agent if available and not already running.
